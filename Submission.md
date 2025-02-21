@@ -112,7 +112,7 @@ done
 ```
 We thus have 10 files generated
 
-#### Decreasing Position Values of Chromosomes
+#### SNPs in Decreasing Position Values 
 
 Next we need to sort them in decreasing order with missing data encoded by a hyphen\
 A similar procedure as above is repeated.
@@ -135,7 +135,7 @@ grep -w "multiple" maize_joined.txt > maize_multiple.txt
 ```
 
 ### Teosinte Data
-The procedure follows the same workflow as in the case of maize\
+The procedure follows the same workflow as in the case of maize.
 
 ```
 $ awk '$3 ~ /Group|ZMPBA|ZMPIL|ZMPJA/' fang_et_al_genotypes.txt > teosinte.txt
@@ -150,3 +150,27 @@ $ cat headerteo.txt sorted_teosinte.txt > teosinte_with_header.txt
 $ sed 's/Sample_ID/SNP_ID/' teosinte_with_header.txt > teosinte_final.txt
 $ join -1 1 -2 1 -t $'\t' snp_data.txt teosinte_final.txt > teosinte_joined.txt
 ```
+#### SNPs in increasing position values
+```
+sed 's/unknown/?/g' teosinte_joined.txt | sort -k3,3n >teosinte_data_sorted.txt
+$ for i in {1..10}; do
+awk -v chr="$i" '$2 == chr' teosinte_data_sorted.txt > teosinte_inreasing_chr${i}.txt
+done
+```
+#### SNPs in decreasing position values
+```
+sed 's/unknown/-/g' teosinte_joined.txt | sort -k 3 -r -n  >teosinte_data_rev_sorted.txt
+$ for i in {1..10}; do
+awk -v chr="$i" '$2 == chr' teosinte_data_rev_sorted.txt > teosinte_decreasing_chr${i}.txt
+done
+```
+#### SNPs with unknown positions
+```
+$ grep -w "unknown" teosinte_joined.txt > teosinte_unknown.txt
+```
+#### SNPs with multiple positions
+```
+grep -w "multiple" teosinte_joined.txt > teosinte_multiple.txt
+```
+
+Thus the required files are suitably extracted.
