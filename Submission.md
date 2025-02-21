@@ -173,9 +173,9 @@ $ grep -w "unknown" teosinte_joined.txt > teosinte_unknown.txt
 $ grep -w "multiple" teosinte_joined.txt > teosinte_multiple.txt
 ```
 
-Thus the required files are suitably extracted.
-Update:
-We needed to replace all unknown data containing '?/?' entry with ? for increasing files and - for decreasing files
+Thus the required files are suitably extracted.\
+Update:\
+We needed to replace all unknown data containing '?/?' entry with ? for increasing files and - for decreasing files\
 '''
 $ for file in maize_increasing_chr*.txt; do     sed -i 's|\??/?||g' "$file"; done
 $ for file in maize_decreasing_chr*.txt; do     sed -i 's|\?/?|-|g' "$file"; done
