@@ -11,7 +11,7 @@ $ head -2 fang_et_al_genotypes.txt
 $ head -2 snp_position.txt
 ```
 
-### Attributes of `fang_et_al_genotypes`
+### Attributes of `fang_et_al_genotypes.txt`
 ```
 $ wc fang_et_al_genotypes.txt
 $ du -h fang_et_al_genotypes.txt
@@ -25,7 +25,7 @@ By inspecting this file I learned that:
 * File size: 6.7 M
 * Number of columns = 986
 
-###Attributes of `snp_position.txt`
+### Attributes of `snp_position.txt`
 
 ```
 $ wc snp_position.txt
@@ -42,12 +42,66 @@ By inspecting this file I learned that:
 
 
 ## Data Processing
+To combine the information in the two data files, we use the join command.
+First file (fang_et_al_genotypes.txt) has Sample IDs in its first column
+Second file has SNP IDs in its first columnn
+We need to transpose our data before merging to process data in rows.
 
 ### Maize Data
+We need to extract certain groups (ZMMIL, ZMMLR, and ZMMMR) from the third column column of the fang_et_al_genotypes.txt file.
 
 ```
-here is my snippet of code used for data processing
+$ awk -f'\t' '$3 ~ /ZMMIL|ZMMLR|ZMMMR/' fang_et_al_genotypes.txt > maize.txt
+$ head maize.txt
+
 ```
+The genotype data is in the rows, it is convenient to transpose this data before we process it.
+```
+$ awk -f transpose.awk maize.txt > maize_transposed.txt
+```
+We need SNPs ordered on increasing position values. This can be done using the sort command
+Before sorting, based on values, we need to save the header for later use
+```
+$ head -n 1 maize_transposed.txt > header.txt
+```
+Sorting genotype data:
+The first three lines contain non-numerical values, this is seen using 
+```
+$ head -n 3 maize_transposed.txt
+```
+We sort the rest of the numeric data in the file
+```
+$ tail -n +4 maize_transposed.txt | sort -k1,1 > sorted_maize.txt
+```
+Now the data is ready after sorting, we add the header 
+```
+cat header.txt sorted_maize.txt > sorted_maize_with_header.txt
+```
+A similar procedure is repeated for the other file
+
+
+#### Processing SNP Position data
+```
+$ head -n 1 snp_position.txt > snp_header.txt
+$ tail -n +2 snp_position.txt | sort -k1,1 > sorted_snp.txt
+$ cat snp_header.txt sorted_snp.txt > sorted_snp_with_header.txt
+```
+
+When we join the above data, we need it in the following format
+* SNP_ID, Chromosome, Position. Genotype data
+This means we just need columns 1,3 and 4 from the SNP data
+```
+$ cut -f 1,3,4 sorted_snp_with_header.txt > snp_data.txt
+```
+We need to combine genotypes to this snp_data.txt
+```
+sed 's/Sample_ID/SNP_ID/' sorted_maize_with_header.txt > maize_final.txt
+join -1 1 -2 1 -t $'\t' snp_data.txt maize_final.txt > maize_joined.txt
+```
+Here, -1 1 denotes column 1 of the first file and -2 1 denotes the second column of the first file
+
+
+
 
 Here is my brief description of what this code does
 
