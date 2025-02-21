@@ -1,5 +1,5 @@
 # UNIX_Assignment_Vaish
-My attempt of UNIX assignment
+
 The Maize files are named as below 
 * maize_increasing_chr(i).txt : 10 files for 10 chromosomes
 * maize_decreasing_chr(i).txt : 10 files for 10 chromosomes
