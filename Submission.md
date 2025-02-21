@@ -123,7 +123,7 @@ $ for i in {1..10}; do
 awk -v chr="$i" '$2 == chr' maize_data_rev_sorted.txt > maize_decreasing_chr${i}.txt
 done
 ```
-Thus we have 10 files generated\
+Thus we have 10 files generated
 
 #### SNPs with unknown positions
 ```
@@ -152,14 +152,14 @@ $ join -1 1 -2 1 -t $'\t' snp_data.txt teosinte_final.txt > teosinte_joined.txt
 ```
 #### SNPs in increasing position values
 ```
-sed 's/unknown/?/g' teosinte_joined.txt | sort -k3,3n >teosinte_data_sorted.txt
+$ sed 's/unknown/?/g' teosinte_joined.txt | sort -k3,3n >teosinte_data_sorted.txt
 $ for i in {1..10}; do
 awk -v chr="$i" '$2 == chr' teosinte_data_sorted.txt > teosinte_inreasing_chr${i}.txt
 done
 ```
 #### SNPs in decreasing position values
 ```
-sed 's/unknown/-/g' teosinte_joined.txt | sort -k 3 -r -n  >teosinte_data_rev_sorted.txt
+$ sed 's/unknown/-/g' teosinte_joined.txt | sort -k 3 -r -n  >teosinte_data_rev_sorted.txt
 $ for i in {1..10}; do
 awk -v chr="$i" '$2 == chr' teosinte_data_rev_sorted.txt > teosinte_decreasing_chr${i}.txt
 done
@@ -170,7 +170,7 @@ $ grep -w "unknown" teosinte_joined.txt > teosinte_unknown.txt
 ```
 #### SNPs with multiple positions
 ```
-grep -w "multiple" teosinte_joined.txt > teosinte_multiple.txt
+$ grep -w "multiple" teosinte_joined.txt > teosinte_multiple.txt
 ```
 
 Thus the required files are suitably extracted.
