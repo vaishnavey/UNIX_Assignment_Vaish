@@ -42,16 +42,16 @@ By inspecting this file I learned that:
 
 
 ## Data Processing
-To combine the information in the two data files, we use the join command.
-First file (fang_et_al_genotypes.txt) has Sample IDs in its first column
-Second file has SNP IDs in its first columnn
+To combine the information in the two data files, we use the join command.\
+First file (fang_et_al_genotypes.txt) has Sample IDs in its first column\
+Second file has SNP IDs in its first columnn\
 We need to transpose our data before merging to process data in rows.
 
 ### Maize Data
 We need to extract certain groups (ZMMIL, ZMMLR, and ZMMMR) from the third column column of the fang_et_al_genotypes.txt file.
 
 ```
-$ awk -f'\t' '$3 ~ /ZMMIL|ZMMLR|ZMMMR/' fang_et_al_genotypes.txt > maize.txt
+$ awk '$3 ~ /Group|ZMMIL|ZMMLR|ZMMMR/' fang_et_al_genotypes.txt > maize.txt
 $ head maize.txt
 
 ```
@@ -59,7 +59,7 @@ The genotype data is in the rows, it is convenient to transpose this data before
 ```
 $ awk -f transpose.awk maize.txt > maize_transposed.txt
 ```
-We need SNPs ordered on increasing position values. This can be done using the sort command
+We need SNPs ordered on increasing position values. This can be done using the sort command.\
 Before sorting, based on values, we need to save the header for later use
 ```
 $ head -n 1 maize_transposed.txt > header.txt
@@ -95,21 +95,58 @@ $ cut -f 1,3,4 sorted_snp_with_header.txt > snp_data.txt
 ```
 We need to combine genotypes to this snp_data.txt
 ```
-sed 's/Sample_ID/SNP_ID/' sorted_maize_with_header.txt > maize_final.txt
-join -1 1 -2 1 -t $'\t' snp_data.txt maize_final.txt > maize_joined.txt
+$ sed 's/Sample_ID/SNP_ID/' sorted_maize_with_header.txt > maize_final.txt
+$ join -1 1 -2 1 -t $'\t' snp_data.txt maize_final.txt > maize_joined.txt
 ```
-Here, -1 1 denotes column 1 of the first file and -2 1 denotes the second column of the first file
+Here, -1 1 denotes column 1 of the first file and -2 1 denotes the second column of the first file.\
+#### Increasing Position Values of Chromosomes
 
+Now that we have joined the two datafiles, we need to sort them based on increasing position values and with missing data encoded by this symbol ?\
+The unknown data in the file which are denoted by ? are grouped.
+```
+$ sed 's/unknown/?/g' maize_joined.txt | sort -k3,3n > maize_data_sorted.txt 
 
+$ for i in {1..10}; do
+awk -v chr="$i" '$2 == chr' maize_data_sorted.txt > maize_increasing_chr${i}.txt
+done
+```
+We thus have 10 files generated
 
+#### Decreasing Position Values of Chromosomes
 
-Here is my brief description of what this code does
+Next we need to sort them in decreasing order with missing data encoded by a hyphen\
+A similar procedure as above is repeated.
+```
+$ sed 's/unknown/-/g' maize_joined.txt | sort -k 3 -r -n > maize_data_rev_sorted.txt 
 
+$ for i in {1..10}; do
+awk -v chr="$i" '$2 == chr' maize_data_rev_sorted.txt > maize_decreasing_chr${i}.txt
+done
+```
+Thus we have 10 files generated\
 
-###Teosinte Data
+#### SNPs with unknown positions
+```
+$ grep -w "unknown" maize_joined.txt > maize_unknown.txt
+```
+#### SNPs with multiple positions
+```
+grep -w "multiple" maize_joined.txt > maize_multiple.txt
+```
+
+### Teosinte Data
+The procedure follows the same workflow as in the case of maize\
 
 ```
-here is my snippet of code used for data processing
-```
+$ awk '$3 ~ /Group|ZMPBA|ZMPIL|ZMPJA/' fang_et_al_genotypes.txt > teosinte.txt
+$ awk -f transpose.awk teosinte.txt > teosinte_transposed.txt
+$ head -n 1 teosinte_transposed.txt > headerteo.txt
 
-Here is my brief description of what this code does
+```
+The first three lines of the file contains non-numerical values, and thus the numerical value-based sorting is carried out
+```
+$ tail -n +4 teosinte_transposed.txt | sort -k1,1 > sorted_teosinte.txt
+$ cat headerteo.txt sorted_teosinte.txt > teosinte_with_header.txt
+$ sed 's/Sample_ID/SNP_ID/' teosinte_with_header.txt > teosinte_final.txt
+$ join -1 1 -2 1 -t $'\t' snp_data.txt teosinte_final.txt > teosinte_joined.txt
+```
