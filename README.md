@@ -1,5 +1,5 @@
 # UNIX_Assignment_Vaish
-
+The description of the commands used are given in Submission.md\
 The Maize files are named as below 
 * maize_increasing_chr(i).txt : 10 files for 10 chromosomes
 * maize_decreasing_chr(i).txt : 10 files for 10 chromosomes
